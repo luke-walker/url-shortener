@@ -1,0 +1,19 @@
+{
+    "name": "url-shortener-backend",
+    "module": "src/index.ts",
+    "devDependencies": {
+        "@types/bun": "latest",
+        "@types/express": "^5.0.0"
+    },
+    "peerDependencies": {
+        "typescript": "^5.0.0"
+    },
+    "scripts": {
+        "dev": "bun run --hot src/index.ts"
+    },
+    "type": "module",
+    "dependencies": {
+        "dotenv": "^16.4.7",
+        "express": "^4.21.2"
+    }
+}
