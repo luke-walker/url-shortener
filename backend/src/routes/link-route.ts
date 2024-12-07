@@ -1,7 +1,7 @@
 import express from "express"
 import { body } from "express-validator"
 
-import { getLinks, createLink } from "../controllers/link-controller.ts"
+import { getLinks, createLink, trustLink } from "../controllers/link-controller.ts"
 import authorizeSession from "../middleware/authorize-session.ts"
 import validateRequest from "../middleware/validate-request.ts"
 
@@ -18,5 +18,9 @@ router.post("/", [
     body("minutes").isInt(),
     validateRequest
 ], createLink);
+
+router.post("/trust/:name", [
+    authorizeSession(),
+], trustLink);
 
 export default router;

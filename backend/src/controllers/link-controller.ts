@@ -51,3 +51,27 @@ export async function createLink(req: Request, res: Response, next: NextFunction
     res.status(200).send("Created link");
     return next();
 }
+
+export async function trustLink(req: Request, res: Response, next: NextFunction) {
+    const userInfo = await getUserInfo(req.cookies.access_token);
+    if (!userInfo) {
+        res.status(401).send("Failed to authorize user");
+        return;
+    }
+
+    const { name } = req.params;
+    await openDBConnection(async (db) => {
+        try {
+            await db.query(`
+                INSERT INTO trusted_links (user_token, name)
+                VALUES (?)
+            `, [[userInfo.token, name]]);
+        } catch (err) {
+            res.status(401).send("Failed to trust link");
+            return;
+        }
+    });
+
+    res.status(200).send("Trusted link");
+    return next();
+}
