@@ -1,7 +1,12 @@
 import express from "express"
 import { body } from "express-validator"
 
-import { getLinks, createLink, trustLink } from "../controllers/link-controller.ts"
+import { 
+    getLinks,
+    createLink,
+    redirectLink,
+    trustLink
+} from "../controllers/link-controller.ts"
 import authorizeSession from "../middleware/authorize-session.ts"
 import validateRequest from "../middleware/validate-request.ts"
 
@@ -18,6 +23,8 @@ router.post("/", [
     body("minutes").isInt(),
     validateRequest
 ], createLink);
+
+router.get("/redirect/:name", redirectLink);
 
 router.post("/trust/:name", [
     authorizeSession(),
