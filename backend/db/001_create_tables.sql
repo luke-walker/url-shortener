@@ -1,4 +1,6 @@
+DROP TABLE IF EXISTS trusted_links CASCADE;
 DROP TABLE IF EXISTS links CASCADE;
+
 CREATE TABLE links (
     name            varchar(20) UNIQUE NOT NULL,
     user_token      varchar(36) NOT NULL,
@@ -7,10 +9,9 @@ CREATE TABLE links (
     PRIMARY KEY (name)
 );
 
-DROP TABLE IF EXISTS trusted_links CASCADE;
 CREATE TABLE trusted_links (
     user_token      varchar(36) NOT NULL,
-    name            varchar(20) NOT NULL,
-    PRIMARY KEY (user_token, name),
-    FOREIGN KEY (name) REFERENCES links (name) ON DELETE CASCADE
+    link_name       varchar(20) NOT NULL,
+    PRIMARY KEY (user_token, link_name),
+    FOREIGN KEY (link_name) REFERENCES links (name) ON DELETE CASCADE
 );
