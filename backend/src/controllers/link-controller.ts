@@ -83,7 +83,7 @@ export async function redirectLink(req: Request, res: Response, next: NextFuncti
                 WHERE user_token=? AND link_name=?
             `, [link.user_token, link.name]);
             if (trustResults.length === 0) {
-                res.status(200).redirect(`${process.env.FRONTEND_URL}/redirect/${encodeURIComponent(link.redirect_url)}` || link.redirect_url)
+                res.status(200).redirect(`${process.env.FRONTEND_URL}/redirect/${link.name}/${encodeURIComponent(link.redirect_url)}` || link.redirect_url)
             } else {
                 res.status(200).redirect(link.redirect_url);
             }
@@ -115,6 +115,30 @@ export async function trustLink(req: Request, res: Response, next: NextFunction)
             return;
         }
         res.status(200).send("Trusted link");
+    });
+
+    return next();
+}
+
+export async function untrustLink(req: Request, res: Response, next: NextFunction) {
+    const userInfo = await getUserInfo(req.cookies.access_token);
+    if (!userInfo) {
+        res.status(401).send("Failed to authorize user");
+        return;
+    }
+
+    const { name } = req.params;
+    await openDBConnection(async (db) => {
+        try {
+            await db.query(`
+                DELETE FROM trusted_links
+                WHERE user_token=? AND link_name=?
+            `, [userInfo.token, name]);
+        } catch (err) {
+            res.status(401).send("Failed to untrust link");
+            return;
+        }
+        res.status(200).send("Untrusted link");
     });
 
     return next();

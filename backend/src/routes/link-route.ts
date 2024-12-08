@@ -5,7 +5,8 @@ import {
     getLinks,
     createLink,
     redirectLink,
-    trustLink
+    trustLink,
+    untrustLink
 } from "../controllers/link-controller.ts"
 import authorizeSession from "../middleware/authorize-session.ts"
 import validateRequest from "../middleware/validate-request.ts"
@@ -27,7 +28,11 @@ router.post("/", [
 router.get("/redirect/:name", redirectLink);
 
 router.post("/trust/:name", [
-    authorizeSession(),
+    authorizeSession()
 ], trustLink);
+
+router.delete("/trust/:name", [
+    authorizeSession()
+], untrustLink);
 
 export default router;
