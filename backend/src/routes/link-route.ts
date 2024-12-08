@@ -27,6 +27,7 @@ router.post("/", [
 ], createLink);
 
 router.delete("/:name", [
+    authorizeSession()
 ], deleteLink);
 
 router.get("/redirect/:name", redirectLink);
