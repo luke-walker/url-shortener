@@ -1,22 +1,27 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from "vue"
 
-import { createLink } from "../services/api-service.ts"
+import { getLinks, createLink, deleteLink } from "../services/api-service.ts"
 import { authorizeUser, authLogout } from "../services/auth-service.ts"
 
 const authState = reactive({
     loggedIn: false
 });
+
 const createLinkForm = reactive({
     name: "",
     redirect: "",
     minutes: 0
 });
-
-const createLinkError = ref("");
+const createLinkText = ref("");
+const createdLinks = ref([]);
 
 onMounted(async () => {
     authState.loggedIn = await authorizeUser();
+    
+    if (authState.loggedIn) {
+        createdLinks.value = await getLinks();
+    }
 });
 
 function onLoginClick() {
@@ -31,8 +36,20 @@ async function onLogoutClick() {
 }
 
 async function onCreateLinkSubmit() {
-    const ok = await createLink(...createLinkForm);
-    createLinkError.value = (ok ? "Created link" : "Failed to create link");
+    const ok = await createLink(createLinkForm.name, createLinkForm.redirect, createLinkForm.minutes);
+    if (ok) {
+        createLinkText.value = "Created link";
+        createdLinks.value = await getLinks();
+    } else {
+        createLinkText.value = "Failed to create link";
+    }
+}
+
+async function onDeleteLinkClick(name) {
+    const ok = await deleteLink(name);
+    if (ok) {
+        createdLinks.value = await getLinks();
+    }
 }
 </script>
 
@@ -46,10 +63,26 @@ async function onCreateLinkSubmit() {
                 <input v-model="createLinkForm.minutes" type="number" name="minutes" />
                 <input type="submit" value="Create Link" />
             </form>
-            <p id="create-link-error">{{ createLinkError }}</p>
+            <p id="create-link-text">{{ createLinkText }}</p>
+            <br />
+            <h3>Created Links</h3>
+            <ul id="link-list">
+                <li class="link-list-item" v-for="link in createdLinks">
+                    {{ link.name }} [{{ link.redirect_url }}]
+                    <br />
+                    <a v-on:click="onDeleteLinkClick(link.name)" href="#">Delete</a>
+                    <br /><br />
+                </li>
+            </ul>
         </div>
         <div v-else id="home-logged-out">
             <button v-on:click="onLoginClick">Login via Central Auth</button>
         </div>
     </div>
 </template>
+
+<style>
+.link-list-item {
+    list-style-type: none;
+}
+</style>
