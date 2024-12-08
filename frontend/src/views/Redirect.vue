@@ -2,9 +2,11 @@
 import { ref, onMounted, onUnmounted } from "vue"
 import { useRoute } from "vue-router"
 
+import { trustLink } from "../services/api-service.ts"
+
 const { name, redirect_url } = useRoute().params;
 
-const countdown = ref(10);
+const countdown = ref(5);
 let intervalId = null;
 
 onMounted(() => {
@@ -26,11 +28,8 @@ onUnmounted(() => {
 });
 
 async function onTrustLinkClick() {
-    const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/link/trust/${name}`, {
-        method: "POST",
-        credentials: "include"
-    });
-    if (res.ok) {
+    const ok = trustLink(name);
+    if (ok) {
         window.location.href = redirect_url;
     }
 }

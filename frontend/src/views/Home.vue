@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from "vue"
 
+import { createLink } from "../services/api-service.ts"
+import { authorizeUser, authLogout } from "../services/auth-service.ts"
+
 const authState = reactive({
     loggedIn: false
 });
@@ -13,14 +16,7 @@ const createLinkForm = reactive({
 const createLinkError = ref("");
 
 onMounted(async () => {
-    try {
-        const res = await fetch(`${import.meta.env.VITE_AUTH_URL}/auth`, {
-            credentials: "include"
-        });
-        authState.loggedIn = res.ok;
-    } catch (err) {
-        authState.loggedIn = false;
-    }
+    authState.loggedIn = await authorizeUser();
 });
 
 function onLoginClick() {
@@ -28,27 +24,15 @@ function onLoginClick() {
 }
 
 async function onLogoutClick() {
-    const res = await fetch(`${import.meta.env.VITE_AUTH_URL}/auth/logout`, {
-        method: "POST",
-        credentials: "include"
-    });
-    if (res.ok) {
+    const ok = await authLogout();
+    if (ok) {
         authState.loggedIn = false;
     }
 }
 
 async function onCreateLinkSubmit() {
-    const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/link`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            ...createLinkForm
-        })
-    });
-    createLinkError.value = (res.ok ? "Created link" : "Failed to create link");
+    const ok = await createLink(...createLinkForm);
+    createLinkError.value = (ok ? "Created link" : "Failed to create link");
 }
 </script>
 
