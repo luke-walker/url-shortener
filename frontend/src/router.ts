@@ -10,13 +10,15 @@ const routes = [
         component: Home
     },
     {
-        path: "/redirect/:url",
+        path: "/redirect/:name/:redirect_url",
         name: "Redirect",
         component: Redirect
     }
 ];
 
-export default createRouter({
+const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes
 });
+
+export default router;
