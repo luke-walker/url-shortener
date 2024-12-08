@@ -1,32 +1,34 @@
 <script setup lang="ts">
-    import { onMounted, reactive } from "vue"
+import { onMounted, reactive } from "vue"
 
-    const authState = reactive({
-        loggedIn: false
-    });
+const authState = reactive({
+    loggedIn: false
+});
 
-    onMounted(async () => {
-        try {
-            const res = await fetch(`${import.meta.env.VITE_AUTH_URL}/auth`, {
-                credentials: "include"
-            });
-            authState.loggedIn = res.ok;
-        } catch (err) {
-            authState.loggedIn = false;
-        }
-    });
-
-    function onLoginClick() {
-        window.location.href = `${import.meta.env.VITE_AUTH_URL}/auth/login/${import.meta.env.VITE_AUTH_TOKEN}`;
-    }
-
-    async function onLogoutClick() {
-        const res = await fetch(`${import.meta.env.VITE_AUTH_URL}/auth/logout`, {
-            method: "POST",
+onMounted(async () => {
+    try {
+        const res = await fetch(`${import.meta.env.VITE_AUTH_URL}/auth`, {
             credentials: "include"
         });
-        authState.loggedIn = !res.ok;
+        authState.loggedIn = res.ok;
+    } catch (err) {
+        authState.loggedIn = false;
     }
+});
+
+function onLoginClick() {
+    window.location.href = `${import.meta.env.VITE_AUTH_URL}/auth/login/${import.meta.env.VITE_AUTH_TOKEN}`;
+}
+
+async function onLogoutClick() {
+    const res = await fetch(`${import.meta.env.VITE_AUTH_URL}/auth/logout`, {
+        method: "POST",
+        credentials: "include"
+    });
+    if (res.ok) {
+        authState.loggedIn = false;
+    }
+}
 </script>
 
 <template>
