@@ -53,6 +53,30 @@ export async function createLink(req: Request, res: Response, next: NextFunction
     return next();
 }
 
+export async function deleteLink(req: Request, res: Response, next: NextFunction) {
+    const userInfo = await getUserInfo(req.cookies.access_token);
+    if (!userInfo) {
+        res.status(401).send("Failed to authorize user");
+        return;
+    }
+
+    const { name } = req.params;
+    await openDBConnection(async (db) => {
+        try {
+            await db.query(`
+                DELETE FROM links
+                WHERE user_token=? AND name=?
+            `, [userInfo.token, name]);
+            res.status(200).send("Deleted link");
+        } catch (err) {
+            res.status(403).send("Failed to delete link");
+            return;
+        }
+    });
+
+    return next();
+}
+
 export async function redirectLink(req: Request, res: Response, next: NextFunction) {
     const { name } = req.params;
     await openDBConnection(async (db) => {

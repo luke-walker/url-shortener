@@ -4,6 +4,7 @@ import { body } from "express-validator"
 import { 
     getLinks,
     createLink,
+    deleteLink,
     redirectLink,
     trustLink,
     untrustLink
@@ -24,6 +25,9 @@ router.post("/", [
     body("minutes").isInt(),
     validateRequest
 ], createLink);
+
+router.delete("/:name", [
+], deleteLink);
 
 router.get("/redirect/:name", redirectLink);
 
