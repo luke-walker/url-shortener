@@ -1,9 +1,16 @@
 <script setup lang="ts">
-import { onMounted, reactive } from "vue"
+import { onMounted, reactive, ref } from "vue"
 
 const authState = reactive({
     loggedIn: false
 });
+const createLinkForm = reactive({
+    name: "",
+    redirect: "",
+    minutes: 0
+});
+
+const createLinkError = ref("");
 
 onMounted(async () => {
     try {
@@ -29,14 +36,35 @@ async function onLogoutClick() {
         authState.loggedIn = false;
     }
 }
+
+async function onCreateLinkSubmit() {
+    const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/link`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            ...createLinkForm
+        })
+    });
+    createLinkError.value = (res.ok ? "Created link" : "Failed to create link");
+}
 </script>
 
 <template>
     <div id="home">
-        <div v-if="authState.loggedIn">
+        <div v-if="authState.loggedIn" id="home-logged-in">
             <button v-on:click="onLogoutClick">Logout</button>
+            <form id="create-link-form" v-on:submit.prevent="onCreateLinkSubmit">
+                <input v-model="createLinkForm.name" type="text" name="name" placeholder="Link Name" />
+                <input v-model="createLinkForm.redirect" type="text" name="redirect" placeholder="Redirect URL" />
+                <input v-model="createLinkForm.minutes" type="number" name="minutes" />
+                <input type="submit" value="Create Link" />
+            </form>
+            <p id="create-link-error">{{ createLinkError }}</p>
         </div>
-        <div v-else>
+        <div v-else id="home-logged-out">
             <button v-on:click="onLoginClick">Login via Central Auth</button>
         </div>
     </div>
