@@ -1,4 +1,5 @@
 import cookieParser from "cookie-parser"
+import cors from "cors"
 import "dotenv/config"
 import express from "express"
 
@@ -6,6 +7,10 @@ import linkRouter from "./routes/link-route.ts"
 
 const app = express();
 
+app.use(cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true
+}));
 app.use(cookieParser());
 app.use(express.json());
 
