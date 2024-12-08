@@ -36,20 +36,22 @@ export async function createLink(req: Request, res: Response, next: NextFunction
         return;
     }
 
-    const { name, redirect, expires } = req.body;
+    const { name, redirect, minutes } = req.body;
+    const expires = (minutes > 0 ? new Date(Date.now() + (minutes * 60000)) : null)
     await openDBConnection(async (db) => {
         try {
             await db.query(`
                 INSERT INTO links (name, user_token, redirect_url, expires)
                 VALUES (?)
             `, [[name, userInfo.token, redirect, expires]]);
+            res.status(200).send("Created link");
         } catch (err) {
+            console.log(err)
             res.status(401).send("Failed to create link"); // maybe change this to 401/500 specific depending on error
             return;
         }
     });
     
-    res.status(200).send("Created link");
     return next();
 }
 

@@ -5,7 +5,7 @@ CREATE TABLE links (
     name            varchar(20) UNIQUE NOT NULL,
     user_token      varchar(36) NOT NULL,
     redirect_url    text NOT NULL,
-    expires         date,
+    expires         datetime,
     PRIMARY KEY (name)
 );
 
