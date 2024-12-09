@@ -11,6 +11,8 @@
         "typescript": "^5.0.0"
     },
     "scripts": {
+        "build": "bun build src/index.ts --outdir=build --target=node",
+        "start": "bun run build/index.js",
         "dev": "bun run --hot src/index.ts"
     },
     "type": "module",
