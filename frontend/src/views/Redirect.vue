@@ -4,16 +4,16 @@ import { useRoute } from "vue-router"
 
 import { trustLink } from "../services/api-service.ts"
 
-const { name, redirect_url } = useRoute().params;
+const { name, redirect_url } = useRoute().params as { name: string, redirect_url: string };
 
 const countdown = ref(5);
-let intervalId = null;
+let intervalId: number = 0;
 
 onMounted(() => {
     intervalId = setInterval(() => {
         if (countdown.value === 0) {
             clearInterval(intervalId);
-            intervalId = null;
+            intervalId = 0;
             window.location.href = redirect_url;
         } else {
             countdown.value--;
@@ -22,13 +22,13 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-    if (intervalId) {
+    if (intervalId > 0) {
         clearInterval(intervalId);
     }
 });
 
 async function onTrustLinkClick() {
-    const ok = trustLink(name);
+    const ok = await trustLink(name);
     if (ok) {
         window.location.href = redirect_url;
     }

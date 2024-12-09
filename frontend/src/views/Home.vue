@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref } from "vue"
+import { onMounted, reactive, ref, Ref } from "vue"
 
 import { getLinks, createLink, deleteLink } from "../services/api-service.ts"
 import { authorizeUser, authLogout } from "../services/auth-service.ts"
@@ -8,13 +8,18 @@ const authState = reactive({
     loggedIn: false
 });
 
+interface LinkItem {
+    name: string;
+    redirect_url: string;
+};
+const createdLinks: Ref<LinkItem[]> = ref([]);
+
 const createLinkForm = reactive({
     name: "",
     redirect: "",
     minutes: 0
 });
 const createLinkText = ref("");
-const createdLinks = ref([]);
 
 onMounted(async () => {
     authState.loggedIn = await authorizeUser();
@@ -45,7 +50,7 @@ async function onCreateLinkSubmit() {
     }
 }
 
-async function onDeleteLinkClick(name) {
+async function onDeleteLinkClick(name: string) {
     const ok = await deleteLink(name);
     if (ok) {
         createdLinks.value = await getLinks();
@@ -67,7 +72,7 @@ async function onDeleteLinkClick(name) {
             <br />
             <h3>Created Links</h3>
             <ul id="link-list">
-                <li class="link-list-item" v-for="link in createdLinks">
+                <li v-for="link in createdLinks" class="link-list-item">
                     {{ link.name }} [{{ link.redirect_url }}]
                     <br />
                     <a v-on:click="onDeleteLinkClick(link.name)" href="#">Delete</a>
